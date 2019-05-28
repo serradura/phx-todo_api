@@ -29,6 +29,12 @@ defmodule TodoApi.TodosTest do
       assert Todos.get_todo!(todo.id) == todo
     end
 
+    test "get_todo!/1 raises an error when the given id isn't found" do
+      assert_raise Ecto.NoResultsError, fn ->
+        Todos.get_todo!(9_999)
+      end
+    end
+
     test "create_todo/1 with valid data creates a todo" do
       assert {:ok, %Todo{} = todo} = Todos.create_todo(@valid_attrs)
       assert todo.complete == true
