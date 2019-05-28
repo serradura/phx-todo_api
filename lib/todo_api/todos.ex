@@ -14,13 +14,13 @@ defmodule TodoApi.Todos do
 
   def create_todo(attrs \\ %{}) do
     %Todo{}
-    |> Todo.changeset(attrs)
+    |> change_todo(attrs)
     |> Repo.insert()
   end
 
   def update_todo(%Todo{} = todo, attrs) do
     todo
-    |> Todo.changeset(attrs)
+    |> change_todo(attrs)
     |> Repo.update()
   end
 
@@ -28,7 +28,7 @@ defmodule TodoApi.Todos do
     Repo.delete(todo)
   end
 
-  def change_todo(%Todo{} = todo) do
-    Todo.changeset(todo, %{})
-  end
+  def change_todo(%Todo{} = todo, attrs \\ %{})
+      when is_map(attrs),
+      do: Todo.changeset(todo, attrs)
 end
