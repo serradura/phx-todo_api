@@ -5,6 +5,7 @@ App created to practise the blog posts of blog.codeship.com about Elixir/Phoenix
 **Blog posts which was read:**
 
 - [x] https://blog.codeship.com/an-introduction-to-apis-with-phoenix/
+- [x] https://blog.codeship.com/ridiculously-fast-api-authentication-with-phoenix/
 
 ---
 
