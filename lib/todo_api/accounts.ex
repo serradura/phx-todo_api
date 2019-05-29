@@ -36,28 +36,6 @@ defmodule TodoApi.Accounts do
 
   alias TodoApi.Accounts.Session
 
-  def list_sessions do
-    Repo.all(Session)
-  end
-
-  def get_session!(id), do: Repo.get!(Session, id)
-
-  def create_session(attrs \\ %{}) do
-    %Session{}
-    |> change_session(attrs)
-    |> Repo.insert()
-  end
-
-  def update_session(%Session{} = session, attrs) do
-    session
-    |> change_session(attrs)
-    |> Repo.update()
-  end
-
-  def delete_session(%Session{} = session) do
-    Repo.delete(session)
-  end
-
   def change_session(%Session{} = session, attrs \\ %{})
     when is_map(attrs),
     do: Session.changeset(session, attrs)

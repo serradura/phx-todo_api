@@ -82,59 +82,20 @@ defmodule TodoApi.AccountsTest do
   describe "sessions" do
     alias TodoApi.Accounts.Session
 
-    @valid_attrs %{token: "some token"}
-    @update_attrs %{token: "some updated token"}
-    @invalid_attrs %{token: nil}
-
-    def session_fixture(attrs \\ %{}) do
-      {:ok, session} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Accounts.create_session()
-
-      session
+    test "change_session/2 returns a session changeset" do
+      assert %Ecto.Changeset{} = Accounts.change_session(%Session{}, %{})
     end
 
-    test "list_sessions/0 returns all sessions" do
-      session = session_fixture()
-      assert Accounts.list_sessions() == [session]
+    test "change_session/2 with valid attributes" do
+      changeset = Accounts.change_session(%Session{}, %{user_id: "12345"})
+      assert changeset.valid?
+      assert changeset.changes.token
     end
 
-    test "get_session!/1 returns the session with given id" do
-      session = session_fixture()
-      assert Accounts.get_session!(session.id) == session
-    end
-
-    test "create_session/1 with valid data creates a session" do
-      assert {:ok, %Session{} = session} = Accounts.create_session(@valid_attrs)
-      assert session.token == "some token"
-    end
-
-    test "create_session/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_session(@invalid_attrs)
-    end
-
-    test "update_session/2 with valid data updates the session" do
-      session = session_fixture()
-      assert {:ok, %Session{} = session} = Accounts.update_session(session, @update_attrs)
-      assert session.token == "some updated token"
-    end
-
-    test "update_session/2 with invalid data returns error changeset" do
-      session = session_fixture()
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_session(session, @invalid_attrs)
-      assert session == Accounts.get_session!(session.id)
-    end
-
-    test "delete_session/1 deletes the session" do
-      session = session_fixture()
-      assert {:ok, %Session{}} = Accounts.delete_session(session)
-      assert_raise Ecto.NoResultsError, fn -> Accounts.get_session!(session.id) end
-    end
-
-    test "change_session/1 returns a session changeset" do
-      session = session_fixture()
-      assert %Ecto.Changeset{} = Accounts.change_session(session)
+    test "change_session/2 with invalid attributes" do
+      changeset = Accounts.change_session(%Session{}, %{user_id: ""})
+      refute changeset.valid?
+      assert changeset.changes == %{}
     end
   end
 end
