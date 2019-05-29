@@ -29,6 +29,6 @@ defmodule TodoApi.Todos do
   end
 
   def change_todo(%Todo{} = todo, attrs \\ %{})
-      when is_map(attrs),
-      do: Todo.changeset(todo, attrs)
+    when is_map(attrs),
+    do: Todo.changeset(todo, attrs)
 end
