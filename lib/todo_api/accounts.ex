@@ -89,16 +89,7 @@ defmodule TodoApi.Accounts do
     Repo.delete(user)
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking user changes.
-
-  ## Examples
-
-      iex> change_user(user)
-      %Ecto.Changeset{source: %User{}}
-
-  """
-  def change_user(%User{} = user) do
-    User.changeset(user, %{})
-  end
+  def change_user(%User{} = user, attrs \\ %{})
+    when is_map(attrs),
+    do: User.changeset(user, attrs)
 end
