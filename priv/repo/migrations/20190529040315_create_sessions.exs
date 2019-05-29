@@ -10,5 +10,6 @@ defmodule TodoApi.Repo.Migrations.CreateSessions do
     end
 
     create index(:sessions, [:user_id])
+    create index(:sessions, [:token])
   end
 end

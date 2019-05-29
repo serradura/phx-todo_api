@@ -14,6 +14,10 @@ defmodule TodoApi.Accounts do
 
   def get_user!(id), do: Repo.get!(User, id)
 
+  def get_user_by_email(email) do
+    Repo.get_by(User, email: email)
+  end
+
   def create_user(attrs \\ %{}) do
     %User{}
     |> change_user(attrs)
@@ -35,6 +39,12 @@ defmodule TodoApi.Accounts do
     do: User.changeset(user, attrs)
 
   alias TodoApi.Accounts.Session
+
+  def create_session(%User{id: user_id}) do
+    %Session{}
+    |> change_session(%{"user_id" => user_id})
+    |> Repo.insert()
+  end
 
   def change_session(%Session{} = session, attrs \\ %{})
     when is_map(attrs),

@@ -1,6 +1,7 @@
 defmodule TodoApi.AccountsTest do
   use TodoApi.DataCase
 
+  alias TodoApi.Repo
   alias TodoApi.Accounts
 
   describe "users" do
@@ -20,13 +21,18 @@ defmodule TodoApi.AccountsTest do
     end
 
     test "list_users/0 returns all users" do
-      user = user_fixture()
-      assert Accounts.list_users() == [%User{user | password: nil}]
+      user = %User{user_fixture() | password: nil}
+      assert Accounts.list_users() == [user]
     end
 
     test "get_user!/1 returns the user with given id" do
-      user = user_fixture()
-      assert Accounts.get_user!(user.id) == %User{user | password: nil}
+      user = %User{user_fixture() | password: nil}
+      assert Accounts.get_user!(user.id) == user
+    end
+
+    test "get_user_by_email/1 returns the user with given email" do
+      user = %User{user_fixture(@valid_attrs) | password: nil}
+      assert Accounts.get_user_by_email(@valid_attrs.email) == user
     end
 
     test "create_user/1 with valid data creates a user" do
@@ -80,7 +86,23 @@ defmodule TodoApi.AccountsTest do
   end
 
   describe "sessions" do
+    alias TodoApi.Accounts.User
     alias TodoApi.Accounts.Session
+
+    test "create_user/1 with valid data creates a session" do
+      {:ok, user} =
+        %{email: "some-email@test.com", password: "s3cr3t"}
+        |> Accounts.create_user()
+
+      assert {:ok, %Session{} = session} = Accounts.create_session(user)
+
+      assert session.user_id == user.id
+      assert session == Repo.get_by(Session, token: session.token)
+    end
+
+    test "create_user/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_session(%User{})
+    end
 
     test "change_session/2 returns a session changeset" do
       assert %Ecto.Changeset{} = Accounts.change_session(%Session{}, %{})

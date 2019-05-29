@@ -10,5 +10,6 @@ defmodule TodoApiWeb.Router do
 
     resources "/todos", TodoController, except: [:new, :edit]
     resources "/users", UserController, only: [:create]
+    resources "/sessions", SessionController, only: [:create]
   end
 end
