@@ -8,15 +8,19 @@ defmodule TodoApiWeb.TodoController do
 
   action_fallback TodoApiWeb.FallbackController
 
-  def index(conn, _params) do
-    user = conn.assigns.current_user
-    todos = Todos.list_todos(user)
+  def action(conn, _) do
+    apply(__MODULE__, action_name(conn), [conn,
+                                          conn.params,
+                                          conn.assigns.current_user])
+  end
+
+  def index(conn, _params, current_user) do
+    todos = Todos.list_todos(current_user)
     render(conn, "index.json", todos: todos)
   end
 
-  def create(conn, %{"todo" => todo_params}) do
-    user = conn.assigns.current_user
-    todo_params = Map.put(todo_params, "owner_id", user.id)
+  def create(conn, %{"todo" => todo_params}, current_user) do
+    todo_params = Map.put(todo_params, "owner_id", current_user.id)
 
     with {:ok, %Todo{} = todo} <- Todos.create_todo(todo_params) do
       conn
@@ -26,25 +30,22 @@ defmodule TodoApiWeb.TodoController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    user = conn.assigns.current_user
-    todo = Todos.get_todo!(id, user)
+  def show(conn, %{"id" => id}, current_user) do
+    todo = Todos.get_todo!(id, current_user)
 
     render(conn, "show.json", todo: todo)
   end
 
-  def update(conn, %{"id" => id, "todo" => todo_params}) do
-    user = conn.assigns.current_user
-    todo = Todos.get_todo!(id, user)
+  def update(conn, %{"id" => id, "todo" => todo_params}, current_user) do
+    todo = Todos.get_todo!(id, current_user)
 
     with {:ok, %Todo{} = todo} <- Todos.update_todo(todo, todo_params) do
       render(conn, "show.json", todo: todo)
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    user = conn.assigns.current_user
-    todo = Todos.get_todo!(id, user)
+  def delete(conn, %{"id" => id}, current_user) do
+    todo = Todos.get_todo!(id, current_user)
 
     with {:ok, %Todo{}} <- Todos.delete_todo(todo) do
       send_resp(conn, :no_content, "")
