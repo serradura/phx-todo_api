@@ -6,6 +6,7 @@ App created to practise the blog posts of blog.codeship.com about Elixir/Phoenix
 
 - [x] https://blog.codeship.com/an-introduction-to-apis-with-phoenix/
 - [x] https://blog.codeship.com/ridiculously-fast-api-authentication-with-phoenix/
+- [x] https://blog.codeship.com/refactoring-faster-can-spell-phoenix/
 
 ---
 
