@@ -8,14 +8,13 @@ defmodule TodoApi.TodosTest do
   describe "todos" do
     alias TodoApi.Todos.Todo
 
+    @valid_user %{email: "johndoe@example.com", password: "123456"}
     @valid_attrs %{complete: true, description: "some description"}
     @update_attrs %{complete: false, description: "some updated description"}
     @invalid_attrs %{complete: nil, description: nil}
 
     def current_user do
-      {:ok, user} = Accounts.create_user(%{
-                      email: "johndoe@example.com", password: "123456"
-                    })
+      {:ok, user} = Accounts.create_user(@valid_user)
       user
     end
 
