@@ -2,6 +2,8 @@ defmodule TodoApi.TodosTest do
   use TodoApi.DataCase
 
   alias TodoApi.Todos
+  alias TodoApi.Accounts
+  alias TodoApi.Accounts.User
 
   describe "todos" do
     alias TodoApi.Todos.Todo
@@ -10,10 +12,19 @@ defmodule TodoApi.TodosTest do
     @update_attrs %{complete: false, description: "some updated description"}
     @invalid_attrs %{complete: nil, description: nil}
 
-    def todo_fixture(attrs \\ %{}) do
+    def current_user do
+      {:ok, user} = Accounts.create_user(%{
+                      email: "johndoe@example.com", password: "123456"
+                    })
+      user
+    end
+
+    def todo_fixture(attrs \\ %{}), do: todo_fixture(attrs, current_user())
+    def todo_fixture(attrs, %User{} = user) do
       {:ok, todo} =
         attrs
         |> Enum.into(@valid_attrs)
+        |> Map.put(:owner_id, user.id)
         |> Todos.create_todo()
 
       todo
@@ -36,7 +47,9 @@ defmodule TodoApi.TodosTest do
     end
 
     test "create_todo/1 with valid data creates a todo" do
-      assert {:ok, %Todo{} = todo} = Todos.create_todo(@valid_attrs)
+      attrs = Map.put(@valid_attrs, :owner_id, current_user().id)
+
+      assert {:ok, %Todo{} = todo} = Todos.create_todo(attrs)
       assert todo.complete == true
       assert todo.description == "some description"
     end

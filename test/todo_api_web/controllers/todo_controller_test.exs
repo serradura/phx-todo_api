@@ -2,7 +2,9 @@ defmodule TodoApiWeb.TodoControllerTest do
   use TodoApiWeb.ConnCase
 
   alias TodoApi.Todos
+  alias TodoApi.Accounts
   alias TodoApi.Todos.Todo
+  alias TodoApi.Accounts.User
 
   @create_attrs %{
     complete: true,
@@ -14,19 +16,45 @@ defmodule TodoApiWeb.TodoControllerTest do
   }
   @invalid_attrs %{complete: nil, description: nil}
 
-  def fixture(:todo) do
-    {:ok, todo} = Todos.create_todo(@create_attrs)
+  def todo_fixture, do: todo_fixture(@create_attrs)
+  def todo_fixture(%User{} = user) do
+    @create_attrs
+    |> Map.put(:owner_id, user.id)
+    |> todo_fixture()
+  end
+  def todo_fixture(attrs) when is_map(attrs) do
+    {:ok, todo} = Todos.create_todo(attrs)
     todo
   end
 
+  def create_user(%{name: name}) do
+    %{email: "#{name}@example.com", password: "123456"}
+    |> Accounts.create_user()
+  end
+
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    {:ok, user} = create_user(%{name: "jane"})
+    {:ok, session} = Accounts.create_session(user)
+
+    conn = conn
+    |> put_req_header("accept", "application/json")
+    |> put_req_header("authorization", "Token token=\"#{session.token}\"")
+    {:ok, conn: conn, current_user: user }
   end
 
   describe "index" do
-    test "lists all todos", %{conn: conn} do
+    test "lists all todos", %{conn: conn, current_user: current_user} do
+      todo_fixture(%{description: "our first todo", owner_id: current_user.id})
+
+      {:ok, another_user} = create_user(%{name: "johndoe"})
+      todo_fixture(%{description: "thier first todo", owner_id: another_user.id})
+
       conn = get(conn, Routes.todo_path(conn, :index))
-      assert json_response(conn, 200)["data"] == []
+      body = json_response(conn, 200)
+      data = body["data"]
+
+      assert Enum.count(data) == 1
+      assert %{"description" => "our first todo"} = hd(data)
     end
   end
 
@@ -51,9 +79,9 @@ defmodule TodoApiWeb.TodoControllerTest do
   end
 
   describe "update todo" do
-    setup [:create_todo]
+    test "renders todo when data is valid", %{conn: conn, current_user: user} do
+      %Todo{id: id} = todo = todo_fixture(user)
 
-    test "renders todo when data is valid", %{conn: conn, todo: %Todo{id: id} = todo} do
       conn = put(conn, Routes.todo_path(conn, :update, todo), todo: @update_attrs)
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
@@ -66,16 +94,16 @@ defmodule TodoApiWeb.TodoControllerTest do
              } = json_response(conn, 200)["data"]
     end
 
-    test "renders errors when data is invalid", %{conn: conn, todo: todo} do
+    test "renders errors when data is invalid", %{conn: conn, current_user: user} do
+      todo = todo_fixture(user)
       conn = put(conn, Routes.todo_path(conn, :update, todo), todo: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
   describe "delete todo" do
-    setup [:create_todo]
-
-    test "deletes chosen todo", %{conn: conn, todo: todo} do
+    test "deletes chosen todo", %{conn: conn, current_user: user} do
+      todo = todo_fixture(user)
       conn = delete(conn, Routes.todo_path(conn, :delete, todo))
       assert response(conn, 204)
 
@@ -83,10 +111,5 @@ defmodule TodoApiWeb.TodoControllerTest do
         get(conn, Routes.todo_path(conn, :show, todo))
       end
     end
-  end
-
-  defp create_todo(_) do
-    todo = fixture(:todo)
-    {:ok, todo: todo}
   end
 end

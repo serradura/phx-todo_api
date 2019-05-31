@@ -2,10 +2,13 @@ defmodule TodoApi.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias TodoApi.Todos.Todo
+
   schema "users" do
     field :email, :string
     field :password_hash, :string
     field :password, :string, virtual: true
+    has_many :todos, Todo, foreign_key: :owner_id
 
     timestamps()
   end
