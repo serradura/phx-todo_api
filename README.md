@@ -10,6 +10,17 @@ App created to practise the blog posts of blog.codeship.com about Elixir/Phoenix
 
 ---
 
+**Variations of the original implementation (master):**
+
+(List from best to worst)
+
+  * [TodoApi.Accounts.Authentication + Todos functions receive the owner as keywords](https://github.com/serradura/phx-todo_api/pull/5)
+  * [TodoApi.Accounts.Authentication + Todos.WithOwner](https://github.com/serradura/phx-todo_api/pull/4)
+  * [Create TodoApi.Accounts.Authentication](https://github.com/serradura/phx-todo_api/pull/3)
+  * [Add CurrentUser context](https://github.com/serradura/phx-todo_api/pull/2)
+
+---
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
@@ -19,6 +30,12 @@ To start your Phoenix server:
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+
+---
+
+To run the test suite:
+
+  * `mix test`
 
 ## Learn more
 
