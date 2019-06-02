@@ -15,14 +15,12 @@ defmodule TodoApiWeb.TodoController do
   end
 
   def index(conn, _params, current_user) do
-    todos = Todos.list_todos(current_user)
+    todos = Todos.list_todos(owner: current_user)
     render(conn, "index.json", todos: todos)
   end
 
   def create(conn, %{"todo" => todo_params}, current_user) do
-    todo_params = Map.put(todo_params, "owner_id", current_user.id)
-
-    with {:ok, %Todo{} = todo} <- Todos.create_todo(todo_params) do
+    with {:ok, %Todo{} = todo} <- Todos.create_todo(todo_params, owner: current_user) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.todo_path(conn, :show, todo))
@@ -31,13 +29,13 @@ defmodule TodoApiWeb.TodoController do
   end
 
   def show(conn, %{"id" => id}, current_user) do
-    todo = Todos.get_todo!(id, current_user)
+    todo = Todos.get_todo!(id, owner: current_user)
 
     render(conn, "show.json", todo: todo)
   end
 
   def update(conn, %{"id" => id, "todo" => todo_params}, current_user) do
-    todo = Todos.get_todo!(id, current_user)
+    todo = Todos.get_todo!(id, owner: current_user)
 
     with {:ok, %Todo{} = todo} <- Todos.update_todo(todo, todo_params) do
       render(conn, "show.json", todo: todo)
@@ -45,9 +43,7 @@ defmodule TodoApiWeb.TodoController do
   end
 
   def delete(conn, %{"id" => id}, current_user) do
-    todo = Todos.get_todo!(id, current_user)
-
-    with {:ok, %Todo{}} <- Todos.delete_todo(todo) do
+    with :ok <- Todos.delete_todo(id, owner: current_user) do
       send_resp(conn, :no_content, "")
     end
   end
