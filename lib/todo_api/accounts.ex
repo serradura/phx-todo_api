@@ -35,8 +35,8 @@ defmodule TodoApi.Accounts do
   end
 
   def change_user(%User{} = user, attrs \\ %{})
-    when is_map(attrs),
-    do: User.changeset(user, attrs)
+  when is_map(attrs),
+  do: User.changeset(user, attrs)
 
   alias TodoApi.Accounts.Session
 
@@ -47,6 +47,6 @@ defmodule TodoApi.Accounts do
   end
 
   def change_session(%Session{} = session, attrs \\ %{})
-    when is_map(attrs),
-    do: Session.changeset(session, attrs)
+  when is_map(attrs),
+  do: Session.changeset(session, attrs)
 end
