@@ -1,4 +1,4 @@
-# TodoApi
+# TodoApi (branch: 2.0.0)
 
 App created to practise the blog posts of blog.codeship.com about Elixir/Phoenix.
 
@@ -10,7 +10,7 @@ App created to practise the blog posts of blog.codeship.com about Elixir/Phoenix
 
 ---
 
-**Variations of the original implementation (master):**
+**Variations of the original implementation ([master](https://github.com/serradura/phx-todo_api/tree/master)):**
 
 (List from best to worst)
 
