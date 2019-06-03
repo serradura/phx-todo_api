@@ -23,9 +23,9 @@ defmodule TodoApiWeb.SessionController do
   end
 
   defp get_user(%{"email" => email, "password" => password}) do
-    with %User{} = user <- Accounts.get_user_by_email(email),
-          true <- valid_user_password?(user, password),
-          do: user
+    with user <- Accounts.get_user_by_email(email),
+         true <- valid_user_password?(user, password),
+    do:  user
   end
 
   defp get_user(_), do: nil

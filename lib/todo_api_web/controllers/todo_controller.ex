@@ -7,11 +7,8 @@ defmodule TodoApiWeb.TodoController do
 
   action_fallback TodoApiWeb.FallbackController
 
-  def action(conn, _) do
-    apply(__MODULE__, action_name(conn), [conn,
-                                          conn.params,
-                                          conn.assigns.current_user])
-  end
+  def action(%Plug.Conn{assigns: %{current_user: current_user}} = conn, _),
+  do: apply(__MODULE__, action_name(conn), [conn, conn.params, current_user])
 
   def index(conn, _params, current_user) do
     todos = Todos.list_todos(owner: current_user)
@@ -19,7 +16,7 @@ defmodule TodoApiWeb.TodoController do
   end
 
   def create(conn, %{"todo" => todo_params}, current_user) do
-    with {:ok, %Todo{} = todo} <- Todos.create_todo(todo_params, owner: current_user) do
+    with {:ok, todo} <- Todos.create_todo(todo_params, owner: current_user) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.todo_path(conn, :show, todo))
@@ -36,7 +33,7 @@ defmodule TodoApiWeb.TodoController do
   def update(conn, %{"id" => id, "todo" => todo_params}, current_user) do
     todo = Todos.get_todo!(id, owner: current_user)
 
-    with {:ok, %Todo{} = todo} <- Todos.update_todo(todo, todo_params) do
+    with {:ok, todo} <- Todos.update_todo(todo, todo_params) do
       render(conn, "show.json", todo: todo)
     end
   end
