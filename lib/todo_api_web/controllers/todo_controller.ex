@@ -2,9 +2,8 @@ defmodule TodoApiWeb.TodoController do
   use TodoApiWeb, :controller
 
   alias TodoApi.Todos
-  alias TodoApi.Todos.Todo
 
-  plug TodoApi.Authentication
+  plug TodoApiWeb.Plug.Authentication
 
   action_fallback TodoApiWeb.FallbackController
 

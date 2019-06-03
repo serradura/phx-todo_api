@@ -1,4 +1,4 @@
-defmodule TodoApi.Authentication do
+defmodule TodoApiWeb.Plug.Authentication do
   import Plug.Conn
 
   alias TodoApi.Accounts.Authentication

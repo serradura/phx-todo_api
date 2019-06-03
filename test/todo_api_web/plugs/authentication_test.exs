@@ -1,8 +1,9 @@
-defmodule TodoApi.AuthenticationTest do
+defmodule TodoApiWeb.Plug.AuthenticationTest do
   use TodoApiWeb.ConnCase
 
-  alias TodoApi.{Repo, Authentication}
+  alias TodoApi.Repo
   alias TodoApi.Accounts.{User, Session}
+  alias TodoApiWeb.Plug.Authentication
 
   @opts Authentication.init([])
 
