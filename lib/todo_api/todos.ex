@@ -9,13 +9,9 @@ defmodule TodoApi.Todos do
   alias TodoApi.Todos.Todo
   alias TodoApi.Accounts.User
 
-  defp get_owner_id(options) when is_list(options) do
-    case options do
-      [{:owner, %User{id: id}} | _] -> id
-      [{:owner_id, owner_id}   | _] -> owner_id
-      _ -> nil
-    end
-  end
+  defp get_owner_id(owner_id: owner_id), do: owner_id
+  defp get_owner_id(owner: %User{id: id}), do: id
+  defp get_owner_id(_), do: nil
 
   defp query_todos_by_owner_id(options)
   when is_list(options),
