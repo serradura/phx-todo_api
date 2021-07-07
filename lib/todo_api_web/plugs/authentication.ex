@@ -3,7 +3,8 @@ defmodule TodoApi.Authentication do
   import Ecto.Query, only: [from: 2]
 
   alias TodoApi.Repo
-  alias TodoApi.Accounts.{User, Session}
+  alias TodoApi.Accounts.{Session}
+  alias TodoApi.CurrentUser
 
   def init(options), do: options
 
@@ -18,7 +19,7 @@ defmodule TodoApi.Authentication do
     with auth_header = get_req_header(conn, "authorization"),
          {:ok, token}   <- parse_token(auth_header),
          {:ok, session} <- find_session_by_token(token),
-    do:  find_user_by_session(session)
+    do:  CurrentUser.find_by_session(session)
   end
 
   defp parse_token(["Token token=" <> token]) do
@@ -30,13 +31,6 @@ defmodule TodoApi.Authentication do
     case Repo.one(from s in Session, where: s.token == ^token) do
       nil     -> :error
       session -> {:ok, session}
-    end
-  end
-
-  defp find_user_by_session(session) do
-    case Repo.get(User, session.user_id) do
-      nil  -> :error
-      user -> {:ok, user}
     end
   end
 

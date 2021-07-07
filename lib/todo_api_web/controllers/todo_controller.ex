@@ -3,6 +3,7 @@ defmodule TodoApiWeb.TodoController do
 
   alias TodoApi.Todos
   alias TodoApi.Todos.Todo
+  alias TodoApi.CurrentUser
 
   plug TodoApi.Authentication
 
@@ -15,14 +16,12 @@ defmodule TodoApiWeb.TodoController do
   end
 
   def index(conn, _params, current_user) do
-    todos = Todos.list_todos(current_user)
+    todos = current_user |> CurrentUser.list_todos()
     render(conn, "index.json", todos: todos)
   end
 
   def create(conn, %{"todo" => todo_params}, current_user) do
-    todo_params = Map.put(todo_params, "owner_id", current_user.id)
-
-    with {:ok, %Todo{} = todo} <- Todos.create_todo(todo_params) do
+    with {:ok, todo} <- current_user |> CurrentUser.create_todo(todo_params) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.todo_path(conn, :show, todo))
@@ -31,13 +30,13 @@ defmodule TodoApiWeb.TodoController do
   end
 
   def show(conn, %{"id" => id}, current_user) do
-    todo = Todos.get_todo!(id, current_user)
+    todo = current_user |> CurrentUser.get_todo!(id)
 
     render(conn, "show.json", todo: todo)
   end
 
   def update(conn, %{"id" => id, "todo" => todo_params}, current_user) do
-    todo = Todos.get_todo!(id, current_user)
+    todo = current_user |> CurrentUser.get_todo!(id)
 
     with {:ok, %Todo{} = todo} <- Todos.update_todo(todo, todo_params) do
       render(conn, "show.json", todo: todo)
@@ -45,7 +44,7 @@ defmodule TodoApiWeb.TodoController do
   end
 
   def delete(conn, %{"id" => id}, current_user) do
-    todo = Todos.get_todo!(id, current_user)
+    todo = current_user |> CurrentUser.get_todo!(id)
 
     with {:ok, %Todo{}} <- Todos.delete_todo(todo) do
       send_resp(conn, :no_content, "")
