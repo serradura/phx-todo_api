@@ -1,9 +1,7 @@
 defmodule TodoApi.Authentication do
   import Plug.Conn
-  import Ecto.Query, only: [from: 2]
 
-  alias TodoApi.Repo
-  alias TodoApi.Accounts.{User, Session}
+  alias TodoApi.Accounts.Authentication
 
   def init(options), do: options
 
@@ -16,29 +14,14 @@ defmodule TodoApi.Authentication do
 
   defp find_user(conn) do
     with auth_header = get_req_header(conn, "authorization"),
-         {:ok, token}   <- parse_token(auth_header),
-         {:ok, session} <- find_session_by_token(token),
-    do:  find_user_by_session(session)
+         {:ok, token} <- parse_token(auth_header),
+    do:  Authentication.find_user_by_token(token)
   end
 
   defp parse_token(["Token token=" <> token]) do
     {:ok, String.replace(token, "\"", "")}
   end
   defp parse_token(_non_token_header), do: :error
-
-  defp find_session_by_token(token) do
-    case Repo.one(from s in Session, where: s.token == ^token) do
-      nil     -> :error
-      session -> {:ok, session}
-    end
-  end
-
-  defp find_user_by_session(session) do
-    case Repo.get(User, session.user_id) do
-      nil  -> :error
-      user -> {:ok, user}
-    end
-  end
 
   defp auth_error!(conn) do
     put_status(conn, :unauthorized)
