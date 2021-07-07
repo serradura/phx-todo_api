@@ -16,14 +16,9 @@ defmodule TodoApiWeb.TodoControllerTest do
   }
   @invalid_attrs %{complete: nil, description: nil}
 
-  def todo_fixture, do: todo_fixture(@create_attrs)
-  def todo_fixture(%User{} = user) do
-    @create_attrs
-    |> Map.put(:owner_id, user.id)
-    |> todo_fixture()
-  end
-  def todo_fixture(attrs) when is_map(attrs) do
-    {:ok, todo} = Todos.create_todo(attrs)
+  def todo_fixture(%User{} = user), do: todo_fixture(user, @create_attrs)
+  def todo_fixture(%User{} = user, attrs) when is_map(attrs) do
+    {:ok, todo} = Todos.WithOwner.create_todo(user, attrs)
     todo
   end
 
@@ -44,10 +39,10 @@ defmodule TodoApiWeb.TodoControllerTest do
 
   describe "index" do
     test "lists all todos", %{conn: conn, current_user: current_user} do
-      todo_fixture(%{description: "our first todo", owner_id: current_user.id})
+      todo_fixture(current_user, %{description: "our first todo"})
 
       {:ok, another_user} = create_user(%{name: "johndoe"})
-      todo_fixture(%{description: "thier first todo", owner_id: another_user.id})
+      todo_fixture(another_user, %{description: "thier first todo"})
 
       conn = get(conn, Routes.todo_path(conn, :index))
       body = json_response(conn, 200)
